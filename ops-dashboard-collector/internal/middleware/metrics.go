@@ -6,11 +6,12 @@ import (
 	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promauto"
 )
 
 // On définit le compteur
 // "Vec" signifie Vector: on peut trier par étiquettes (method,, status, path)
-var httpRequestsTotal = prometheus.NewCounterVec(
+var httpRequestsTotal = promauto.NewCounterVec(
 	prometheus.CounterOpts{
 		Name: "http_requests_total",
 		Help: "Nombre total de requêtes HTTP",
@@ -18,7 +19,7 @@ var httpRequestsTotal = prometheus.NewCounterVec(
 	[]string{"method", "status", "path"}, // Etiquettes
 )
 
-var httpRequestDuration = prometheus.NewHistogramVec(
+var httpRequestDuration = promauto.NewHistogramVec(
 	prometheus.HistogramOpts{
 		Name:    "http_request_duration_seconds",
 		Help:    "Durée des requêtes en secondes",
