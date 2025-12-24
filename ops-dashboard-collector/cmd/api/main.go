@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/mtk14m/ops-dashboard-collector/internal/handlers"
+	"github.com/mtk14m/ops-dashboard-collector/internal/middleware"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
@@ -28,17 +29,17 @@ func main() {
 	HealthHandler := &handlers.HealthHandler{Logger: logger}
 
 	mux := http.NewServeMux()
-
 	//ROUTES METIERS
 	mux.Handle("/health", HealthHandler)
-
 	//ROUTES TECHNIQUES
 	mux.Handle("/metrics", promhttp.Handler())
+
+	handlerWithMetrics :=  middleware.MetricsMiddleware(mux)
 
 	//3. Configuration du serveur avec Timeouts (Sécurité SRE)
 	srv := &http.Server{
 		Addr:         ":" + port,
-		Handler:      mux, //possibilité d'ajouter middleware
+		Handler:      handlerWithMetrics, // On a ajouté ici notre middleware
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  120 * time.Second,
